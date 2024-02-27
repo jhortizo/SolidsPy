@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "solidspy"
+version = "0.1.0"
+description = ""
+authors = ["José Ortiz-Ocampo <joseortiz1807@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.26.4"
+scipy = "^1.12.0"
+matplotlib = "^3.8.3"
+easygui = "^0.98.3"
+meshio = "^5.3.5"
+ipykernel = "^6.29.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
