@@ -1,4 +1,4 @@
- # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 FEM routines
 ------------
@@ -21,6 +21,7 @@ References
 
 """
 import numpy as np
+
 import solidspy.gaussutil as gau
 
 
@@ -60,14 +61,16 @@ def eletype(eletype):
         5: (4, 2, 3),
         6: (4, 2, 3),
         7: (6, 2, 3),
-        8: (6, 2, 3)}
+        8: (6, 2, 3),
+    }
     try:
         return elem_id[eletype]
     except:
         raise ValueError("You entered an invalid type of element.")
 
 
-#%% Shape functions and derivatives
+# %% Shape functions and derivatives
+
 
 # Triangles
 def shape_tri3(r, s):
@@ -112,9 +115,7 @@ def shape_tri3(r, s):
 
     """
     N = np.array([1 - r - s, r, s])
-    dNdr = np.array([
-      [-1, 1, 0],
-      [-1, 0, 1]])
+    dNdr = np.array([[-1, 1, 0], [-1, 0, 1]])
     return N, dNdr
 
 
@@ -138,16 +139,23 @@ def shape_tri6(r, s):
         the point (r, s).
     """
     N = np.array(
-        [(1 - r - s) - 2*r*(1 - r - s) - 2*s*(1 - r - s),
-         r - 2*r*(1 - r - s) - 2*r*s,
-         s - 2*r*s - 2*s*(1-r-s),
-         4*r*(1 - r - s),
-         4*r*s,
-         4*s*(1 - r - s)])
-    dNdr = np.array([
-        [4*r + 4*s - 3, 4*r - 1, 0, -8*r - 4*s + 4, 4*s, -4*s],
-        [4*r + 4*s - 3, 0, 4*s - 1, -4*r, 4*r, -4*r - 8*s + 4]])
+        [
+            (1 - r - s) - 2 * r * (1 - r - s) - 2 * s * (1 - r - s),
+            r - 2 * r * (1 - r - s) - 2 * r * s,
+            s - 2 * r * s - 2 * s * (1 - r - s),
+            4 * r * (1 - r - s),
+            4 * r * s,
+            4 * s * (1 - r - s),
+        ]
+    )
+    dNdr = np.array(
+        [
+            [4 * r + 4 * s - 3, 4 * r - 1, 0, -8 * r - 4 * s + 4, 4 * s, -4 * s],
+            [4 * r + 4 * s - 3, 0, 4 * s - 1, -4 * r, 4 * r, -4 * r - 8 * s + 4],
+        ]
+    )
     return N, dNdr
+
 
 # Quadrilaterals
 def shape_quad4(r, s):
@@ -191,14 +199,12 @@ def shape_quad4(r, s):
     True
 
     """
-    N = 0.25*np.array(
-        [(1 - r)*(1 - s),
-         (1 + r)*(1 - s),
-         (1 + r)*(1 + s),
-         (1 - r)*(1 + s)])
-    dNdr = 0.25*np.array([
-        [s - 1, -s + 1, s + 1, -s - 1],
-        [r - 1, -r - 1, r + 1, -r + 1]])
+    N = 0.25 * np.array(
+        [(1 - r) * (1 - s), (1 + r) * (1 - s), (1 + r) * (1 + s), (1 - r) * (1 + s)]
+    )
+    dNdr = 0.25 * np.array(
+        [[s - 1, -s + 1, s + 1, -s - 1], [r - 1, -r - 1, r + 1, -r + 1]]
+    )
     return N, dNdr
 
 
@@ -222,36 +228,45 @@ def shape_quad9(r, s):
         the point (r, s).
     """
     N = np.array(
-        [0.25*r*s*(r - 1.0)*(s - 1.0),
-         0.25*r*s*(r + 1.0)*(s - 1.0),
-         0.25*r*s*(r + 1.0)*(s + 1.0),
-         0.25*r*s*(r - 1.0)*(s + 1.0),
-         0.5*s*(-r**2 + 1.0)*(s - 1.0),
-         0.5*r*(r + 1.0)*(-s**2 + 1.0),
-         0.5*s*(-r**2 + 1.0)*(s + 1.0),
-         0.5*r*(r - 1.0)*(-s**2 + 1.0),
-         (-r**2 + 1.0)*(-s**2 + 1.0)])
-    dNdr = np.array([
-        [0.25*s*(2.0*r - 1.0)*(s - 1.0),
-         0.25*s*(2.0*r + 1.0)*(s - 1.0),
-         0.25*s*(2.0*r + 1.0)*(s + 1.0),
-         0.25*s*(2.0*r - 1.0)*(s + 1.0),
-         r*s*(-s + 1.0),
-         -0.5*(2.0*r + 1.0)*(s**2 - 1.0),
-         -r*s*(s + 1.0),
-         0.5*(-2.0*r + 1.0)*(s**2 - 1.0),
-         2.0*r*(s**2 - 1.0)],
-        [0.25*r*(r - 1.0)*(2.0*s - 1.0),
-         0.25*r*(r + 1.0)*(2.0*s - 1.0),
-         0.25*r*(r + 1.0)*(2.0*s + 1.0),
-         0.25*r*(r - 1.0)*(2.0*s + 1.0),
-         0.5*(r**2 - 1.0)*(-2.0*s + 1.0),
-         -r*s*(r + 1.0),
-         -0.5*(r**2 - 1.0)*(2.0*s + 1.0),
-         r*s*(-r + 1.0),
-         2.0*s*(r**2 - 1.0)]])
+        [
+            0.25 * r * s * (r - 1.0) * (s - 1.0),
+            0.25 * r * s * (r + 1.0) * (s - 1.0),
+            0.25 * r * s * (r + 1.0) * (s + 1.0),
+            0.25 * r * s * (r - 1.0) * (s + 1.0),
+            0.5 * s * (-(r**2) + 1.0) * (s - 1.0),
+            0.5 * r * (r + 1.0) * (-(s**2) + 1.0),
+            0.5 * s * (-(r**2) + 1.0) * (s + 1.0),
+            0.5 * r * (r - 1.0) * (-(s**2) + 1.0),
+            (-(r**2) + 1.0) * (-(s**2) + 1.0),
+        ]
+    )
+    dNdr = np.array(
+        [
+            [
+                0.25 * s * (2.0 * r - 1.0) * (s - 1.0),
+                0.25 * s * (2.0 * r + 1.0) * (s - 1.0),
+                0.25 * s * (2.0 * r + 1.0) * (s + 1.0),
+                0.25 * s * (2.0 * r - 1.0) * (s + 1.0),
+                r * s * (-s + 1.0),
+                -0.5 * (2.0 * r + 1.0) * (s**2 - 1.0),
+                -r * s * (s + 1.0),
+                0.5 * (-2.0 * r + 1.0) * (s**2 - 1.0),
+                2.0 * r * (s**2 - 1.0),
+            ],
+            [
+                0.25 * r * (r - 1.0) * (2.0 * s - 1.0),
+                0.25 * r * (r + 1.0) * (2.0 * s - 1.0),
+                0.25 * r * (r + 1.0) * (2.0 * s + 1.0),
+                0.25 * r * (r - 1.0) * (2.0 * s + 1.0),
+                0.5 * (r**2 - 1.0) * (-2.0 * s + 1.0),
+                -r * s * (r + 1.0),
+                -0.5 * (r**2 - 1.0) * (2.0 * s + 1.0),
+                r * s * (-r + 1.0),
+                2.0 * s * (r**2 - 1.0),
+            ],
+        ]
+    )
     return N, dNdr
-
 
 
 def shape_quad8(r, s):
@@ -273,32 +288,42 @@ def shape_quad8(r, s):
         Array with the derivative of the shape functions evaluated at
         the point (r, s).
     """
-    N = 0.25*np.array(
-        [(1.0 - r)*(1.0 - s) - (1.0 - r)*(1.0 - s**2) - (1.0 - s)*(1.0 - r**2),
-         (1.0 + r)*(1.0 - s) - (1.0 + r)*(1.0 - s**2) - (1.0 - s)*(1.0 - r**2),
-         (1.0 + r)*(1.0 + s) - (1.0 + r)*(1.0 - s**2) - (1.0 + s)*(1.0 - r**2),
-         (1.0 - r)*(1.0 + s) - (1.0 - r)*(1.0 - s**2) - (1.0 + s)*(1.0 - r**2),
-         2.0*(1.0 - s)*(1.0 - r**2),
-         2.0*(1.0 + r)*(1.0 - s**2),
-         2.0*(1.0 + s)*(1.0 - r**2),
-         2.0*(1.0 - r)*(1.0 - s**2)])
-    dNdr = 0.25*np.array([
-        [-2.0*r*(s - 1.0) - s**2 + s,
-         -2.0*r*(s - 1.0) + s**2 - s,
-         -2.0*r*(-s - 1.0) + s**2 + s,
-         -2.0*r*(-s - 1.0) - s**2 - s,
-         -2.0*r*(2.0 - 2.0*s),
-         2.0 - 2.0*s**2,
-         -2.0*r*(2.0*s + 2.0),
-         2.0*s**2 - 2.0],
-        [-r**2 + r - 2.0*s*(r - 1.0),
-         -r**2 - r - 2.0*s*(-r - 1.0),
-         r**2 + r - 2.0*s*(-r - 1.0),
-         r**2 - r - 2.0*s*(r - 1.0),
-         2.0*r**2 - 2.0,
-         -2.0*s*(2.0*r + 2.0),
-         2.0 - 2.0*r**2,
-         -2.0*s*(2.0 - 2.0*r)]])
+    N = 0.25 * np.array(
+        [
+            (1.0 - r) * (1.0 - s) - (1.0 - r) * (1.0 - s**2) - (1.0 - s) * (1.0 - r**2),
+            (1.0 + r) * (1.0 - s) - (1.0 + r) * (1.0 - s**2) - (1.0 - s) * (1.0 - r**2),
+            (1.0 + r) * (1.0 + s) - (1.0 + r) * (1.0 - s**2) - (1.0 + s) * (1.0 - r**2),
+            (1.0 - r) * (1.0 + s) - (1.0 - r) * (1.0 - s**2) - (1.0 + s) * (1.0 - r**2),
+            2.0 * (1.0 - s) * (1.0 - r**2),
+            2.0 * (1.0 + r) * (1.0 - s**2),
+            2.0 * (1.0 + s) * (1.0 - r**2),
+            2.0 * (1.0 - r) * (1.0 - s**2),
+        ]
+    )
+    dNdr = 0.25 * np.array(
+        [
+            [
+                -2.0 * r * (s - 1.0) - s**2 + s,
+                -2.0 * r * (s - 1.0) + s**2 - s,
+                -2.0 * r * (-s - 1.0) + s**2 + s,
+                -2.0 * r * (-s - 1.0) - s**2 - s,
+                -2.0 * r * (2.0 - 2.0 * s),
+                2.0 - 2.0 * s**2,
+                -2.0 * r * (2.0 * s + 2.0),
+                2.0 * s**2 - 2.0,
+            ],
+            [
+                -(r**2) + r - 2.0 * s * (r - 1.0),
+                -(r**2) - r - 2.0 * s * (-r - 1.0),
+                r**2 + r - 2.0 * s * (-r - 1.0),
+                r**2 - r - 2.0 * s * (r - 1.0),
+                2.0 * r**2 - 2.0,
+                -2.0 * s * (2.0 * r + 2.0),
+                2.0 - 2.0 * r**2,
+                -2.0 * s * (2.0 - 2.0 * r),
+            ],
+        ]
+    )
     return N, dNdr
 
 
@@ -325,10 +350,7 @@ def shape_tet4(r, s, t):
         the point (r, s, t).
     """
     N = np.array([1 - r - s - t, r, s, t])
-    dNdr = np.array([
-        [-1, 1, 0, 0],
-        [-1, 0, 1, 0],
-        [-1, 0, 0, 1]])
+    dNdr = np.array([[-1, 1, 0, 0], [-1, 0, 1, 0], [-1, 0, 0, 1]])
     return N, dNdr
 
 
@@ -353,28 +375,56 @@ def shape_hex8(r, s, t):
         Array with the derivative of the shape functions evaluated at
         the point (r, s, t).
     """
-    N = np.array([
-        (1 - r)*(1 - s)*(1 - t), (1 - s)*(1 - t)*(r + 1),
-        (1 - t)*(r + 1)*(s + 1), (1 - r)*(1 - t)*(s + 1),
-        (1 - r)*(1 - s)*(t + 1), (1 - s)*(r + 1)*(t + 1),
-        (r + 1)*(s + 1)*(t + 1), (1 - r)*(s + 1)*(t + 1)])
-    dNdr = np.array([
-        [(1 - t)*(s - 1), (1 - s)*(1 - t),
-         (1 - t)*(s + 1), (1 - t)*(-s - 1),
-         (1 - s)*(-t - 1), (1 - s)*(t + 1),
-         (s + 1)*(t + 1), -(s + 1)*(t + 1)],
-        [(1 - t)*(r - 1), (1 - t)*(-r - 1),
-         (1 - t)*(r + 1), (1 - r)*(1 - t),
-         -(1 - r)*(t + 1), -(r + 1)*(t + 1),
-         (r + 1)*(t + 1), (1 - r)*(t + 1)],
-        [-(1 - r)*(1 - s), -(1 - s)*(r + 1),
-         -(r + 1)*(s + 1), -(1 - r)*(s + 1),
-         (1 - r)*(1 - s), (1 - s)*(r + 1),
-         (r + 1)*(s + 1), (1 - r)*(s + 1)]])
-    return 0.125*N, 0.125*dNdr
+    N = np.array(
+        [
+            (1 - r) * (1 - s) * (1 - t),
+            (1 - s) * (1 - t) * (r + 1),
+            (1 - t) * (r + 1) * (s + 1),
+            (1 - r) * (1 - t) * (s + 1),
+            (1 - r) * (1 - s) * (t + 1),
+            (1 - s) * (r + 1) * (t + 1),
+            (r + 1) * (s + 1) * (t + 1),
+            (1 - r) * (s + 1) * (t + 1),
+        ]
+    )
+    dNdr = np.array(
+        [
+            [
+                (1 - t) * (s - 1),
+                (1 - s) * (1 - t),
+                (1 - t) * (s + 1),
+                (1 - t) * (-s - 1),
+                (1 - s) * (-t - 1),
+                (1 - s) * (t + 1),
+                (s + 1) * (t + 1),
+                -(s + 1) * (t + 1),
+            ],
+            [
+                (1 - t) * (r - 1),
+                (1 - t) * (-r - 1),
+                (1 - t) * (r + 1),
+                (1 - r) * (1 - t),
+                -(1 - r) * (t + 1),
+                -(r + 1) * (t + 1),
+                (r + 1) * (t + 1),
+                (1 - r) * (t + 1),
+            ],
+            [
+                -(1 - r) * (1 - s),
+                -(1 - s) * (r + 1),
+                -(r + 1) * (s + 1),
+                -(1 - r) * (s + 1),
+                (1 - r) * (1 - s),
+                (1 - s) * (r + 1),
+                (r + 1) * (s + 1),
+                (1 - r) * (s + 1),
+            ],
+        ]
+    )
+    return 0.125 * N, 0.125 * dNdr
 
 
-#%% Derivative matrices
+# %% Derivative matrices
 def elast_diff_2d(r, s, coord, element):
     """
     Interpolation matrices for elements for plane elasticity
@@ -402,8 +452,8 @@ def elast_diff_2d(r, s, coord, element):
     N, dNdr = element(r, s)
     det, jaco_inv = jacoper(dNdr, coord)
     dNdx = jaco_inv @ dNdr
-    H = np.zeros((2, 2*N.shape[0]))
-    B = np.zeros((3, 2*N.shape[0]))
+    H = np.zeros((2, 2 * N.shape[0]))
+    B = np.zeros((3, 2 * N.shape[0]))
     H[0, 0::2] = N
     H[1, 1::2] = N
     B[0, 0::2] = dNdx[0, :]
@@ -415,7 +465,7 @@ def elast_diff_2d(r, s, coord, element):
 
 def elast_diff_axi(r, s, coord, element):
     """
-    Interpolation matrices for elements for axisymetric elasticity
+    Interpolation matrices for elements for axisymmetric elasticity
 
     Parameters
     ----------
@@ -443,8 +493,8 @@ def elast_diff_axi(r, s, coord, element):
         raise ValueError("Horizontal coordinates should be non-negative.")
     det, jaco_inv = jacoper(dNdr, coord)
     dNdx = jaco_inv @ dNdr
-    H = np.zeros((2, 2*N.shape[0]))
-    B = np.zeros((4, 2*N.shape[0]))
+    H = np.zeros((2, 2 * N.shape[0]))
+    B = np.zeros((4, 2 * N.shape[0]))
     H[0, 0::2] = N
     H[1, 1::2] = N
     B[0, 0::2] = dNdx[0, :]
@@ -452,7 +502,7 @@ def elast_diff_axi(r, s, coord, element):
     B[2, 0::2] = dNdx[1, :]
     B[2, 1::2] = dNdx[0, :]
     B[2, 1::2] = dNdx[0, :]
-    B[3, 0::2] = N/x
+    B[3, 0::2] = N / x
     return H, B, det
 
 
@@ -487,8 +537,8 @@ def elast_diff_3d(r, s, t, coord, interp=shape_hex8):
     N, dNdr = interp(r, s, t)
     det, jaco_inv = jacoper(dNdr, coord)
     dNdx = jaco_inv @ dNdr
-    H = np.zeros((3, 3*N.shape[0]))
-    B = np.zeros((6, 3*N.shape[0]))
+    H = np.zeros((3, 3 * N.shape[0]))
+    B = np.zeros((6, 3 * N.shape[0]))
     H[0, 0::3] = N
     H[1, 1::3] = N
     H[2, 2::3] = N
@@ -504,7 +554,7 @@ def elast_diff_3d(r, s, t, coord, interp=shape_hex8):
     return H, B, det
 
 
-#%%
+# %%
 def jacoper(dNdr, coord):
     """
     Compute the Jacobian of the transformation evaluated at
@@ -536,9 +586,9 @@ def jacoper(dNdr, coord):
     return det, jaco_inv
 
 
-#%% Material routines
+# %% Material routines
 def umat(params):
-    """2D Elasticity consitutive matrix in plane stress
+    """2D Elasticity constitutive matrix in plane stress
 
     For plane strain use effective properties.
 
@@ -572,19 +622,19 @@ def umat(params):
     """
     E, nu = params
     C = np.zeros((3, 3))
-    enu = E/(1 - nu**2)
-    mnu = (1 - nu)/2
+    enu = E / (1 - nu**2)
+    mnu = (1 - nu) / 2
     C[0, 0] = enu
-    C[0, 1] = nu*enu
+    C[0, 1] = nu * enu
     C[1, 0] = C[0, 1]
     C[1, 1] = enu
-    C[2, 2] = enu*mnu
+    C[2, 2] = enu * mnu
 
     return C
 
 
 def elast_mat_2d(params):
-    """2D Elasticity consitutive matrix in plain stress
+    """2D Elasticity constitutive matrix in plain stress
 
     For plane stress use effective properties.
 
@@ -605,18 +655,21 @@ def elast_mat_2d(params):
 
     """
     E, nu = params
-    lamda = E*nu/(1 + nu)/(1 - 2*nu)
-    mu = 0.5*E/(1 + nu)
-    C = np.array([
-    [2*mu + lamda, lamda, 0, 0],
-    [lamda, 2*mu + lamda, 0, 0],
-    [0, 0, mu, 0],
-    [0, 0, 0, 2*mu + lamda]])
+    lamda = E * nu / (1 + nu) / (1 - 2 * nu)
+    mu = 0.5 * E / (1 + nu)
+    C = np.array(
+        [
+            [2 * mu + lamda, lamda, 0, 0],
+            [lamda, 2 * mu + lamda, 0, 0],
+            [0, 0, mu, 0],
+            [0, 0, 0, 2 * mu + lamda],
+        ]
+    )
     return C
 
 
 def elast_mat_axi(params):
-    """Elasticity consitutive matrix for axisymmetric problems.
+    """Elasticity constitutive matrix for axisymmetric problems.
 
     Parameters
     ----------
@@ -635,18 +688,21 @@ def elast_mat_axi(params):
 
     """
     E, nu = params
-    lamda = E*nu/(1 + nu)/(1 - 2*nu)
-    mu = 0.5*E/(1 + nu)
-    C = np.array([
-        [2*mu + lamda, lamda, 0, 0],
-        [lamda, 2*mu + lamda, 0, 0],
-        [0, 0, mu, 0],
-        [0, 0, 0, 2*mu + lamda]])
+    lamda = E * nu / (1 + nu) / (1 - 2 * nu)
+    mu = 0.5 * E / (1 + nu)
+    C = np.array(
+        [
+            [2 * mu + lamda, lamda, 0, 0],
+            [lamda, 2 * mu + lamda, 0, 0],
+            [0, 0, mu, 0],
+            [0, 0, 0, 2 * mu + lamda],
+        ]
+    )
     return C
 
 
 def elast_mat(params):
-    """3D Elasticity consitutive matrix.
+    """3D Elasticity constitutive matrix.
 
     Parameters
     ----------
@@ -665,20 +721,22 @@ def elast_mat(params):
 
     """
     E, nu = params
-    lamda = E*nu/(1 + nu)/(1 - 2*nu)
-    mu = 0.5*E/(1 + nu)
-    C = np.array([
-    [2*mu + lamda, lamda, lamda, 0, 0, 0],
-    [lamda, 2*mu + lamda, lamda, 0, 0, 0],
-    [lamda, lamda, 2*mu + lamda, 0, 0, 0],
-    [0, 0, 0, mu, 0, 0],
-    [0, 0, 0, 0, mu, 0],
-    [0, 0, 0, 0, 0, mu]])
+    lamda = E * nu / (1 + nu) / (1 - 2 * nu)
+    mu = 0.5 * E / (1 + nu)
+    C = np.array(
+        [
+            [2 * mu + lamda, lamda, lamda, 0, 0, 0],
+            [lamda, 2 * mu + lamda, lamda, 0, 0, 0],
+            [lamda, lamda, 2 * mu + lamda, 0, 0, 0],
+            [0, 0, 0, mu, 0, 0],
+            [0, 0, 0, 0, mu, 0],
+            [0, 0, 0, 0, 0, mu],
+        ]
+    )
     return C
 
 
-
-#%% Elemental strains
+# %% Elemental strains
 def str_el3(coord, ul):
     """Compute the strains at each element integration point
 
@@ -703,7 +761,7 @@ def str_el3(coord, ul):
     xl = np.zeros([3, 2])
     gpts, _ = gau.gauss_tri(order=1)
     for i in range(gpts.shape[0]):
-        ri, si =  gpts[i, :]
+        ri, si = gpts[i, :]
         H, B, _ = elast_diff_2d(ri, si, coord, shape_tri3)
         epsG[:, i] = B @ ul
         xl[i, 0] = np.dot(H[0, ::2], coord[:, 0])
@@ -768,7 +826,7 @@ def str_el4(coord, ul):
     gpts, _ = gau.gauss_nd(2)
     for i in range(gpts.shape[0]):
         ri, si = gpts[i, :]
-        H, B, _= elast_diff_2d(ri, si, coord, shape_quad4)
+        H, B, _ = elast_diff_2d(ri, si, coord, shape_quad4)
         epsG[:, i] = B @ ul
         xl[i, 0] = np.dot(H[0, ::2], coord[:, 0])
         xl[i, 1] = np.dot(H[0, ::2], coord[:, 0])
@@ -777,4 +835,5 @@ def str_el4(coord, ul):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

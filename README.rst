@@ -48,7 +48,7 @@ Features
 
 * It was created with academic and research purposes.
 
-* It has been used to tech the following courses:
+* It has been used to teach the following courses:
 
   - Computational Modeling.
   - Introduction to the Finite Element Methods.
